@@ -56,35 +56,52 @@ if st.button("🔍 Analyze"):
         video_id = extract_video_id(youtube_url)
 
         if video_id:
-            st.markdown(f"<p style='font-size:12px; color:gray;'>✅ Extracted Video ID: <b>{video_id}</b></p>", unsafe_allow_html=True)
+            st.markdown(f"<p style='font-size:12px; color:lightgray;'>✅ Extracted Video ID: <b>{video_id}</b></p>", unsafe_allow_html=True)
 
-            # Display YouTube Video Thumbnail
-            video_thumbnail = f"https://img.youtube.com/vi/{video_id}/0.jpg"
+            # Generate YouTube Video Embed URL
+            embed_url = f"https://www.youtube.com/embed/{video_id}"
 
             # Fetch comments
             comments = get_youtube_comments(video_id, API_KEY)
 
             if comments:
-                st.markdown(f"<p style='font-size:12px; color:gray;'>✅ Fetched <b>{len(comments)}</b> comments.</p>", unsafe_allow_html=True)
+                st.markdown(f"<p style='font-size:12px; color:lightgray;'>✅ Fetched <b>{len(comments)}</b> comments.</p>", unsafe_allow_html=True)
 
                 # Create DataFrame
                 df = pd.DataFrame(comments, columns=["Comment"])
                 df["Sentiment"] = df["Comment"].apply(analyze_sentiment)
 
                 # 🔹 Arrange UI for Single Screenshot View
-                col1, col2, col3 = st.columns([1, 1.5, 1.5])  # Three columns layout
+                col1, col2 = st.columns([1, 2])  # Two-column layout
 
                 with col1:
-                    st.image(video_thumbnail, caption="🎥 Video Thumbnail", use_column_width=True)
-
-                with col2:
                     st.subheader("📊 Sentiment Distribution")
-                    fig, ax = plt.subplots(figsize=(3, 3))  # Set graph size to 3x3
-                    sns.countplot(x=df["Sentiment"], palette="viridis", ax=ax)
-                    plt.xlabel("Sentiment")
-                    plt.ylabel("Count")
+                    sentiment_counts = df["Sentiment"].value_counts()
+                    
+                    # Dark mode settings for pie chart
+                    fig, ax = plt.subplots(figsize=(3, 3), facecolor="#0e1117")  # Set dark background
+                    colors = ["#1f77b4", "#2ca02c", "#d62728"]  # Blue, Green, Red for Neutral, Positive, Negative
+                    text_colors = ["white", "white", "white"]  # White text for readability
+
+                    wedges, texts, autotexts = ax.pie(
+                        sentiment_counts, labels=sentiment_counts.index, autopct='%1.1f%%',
+                        colors=colors, startangle=140, textprops={'color': "white"}
+                    )
+                    
+                    # Improve text visibility
+                    for text, autotext, color in zip(texts, autotexts, text_colors):
+                        text.set_color(color)
+                        autotext.set_color(color)
+
+                    ax.axis("equal")  # Equal aspect ratio ensures the pie chart is circular
                     st.pyplot(fig)
 
+                with col2:
+                    st.subheader("🎥 Video Playback")
+                    st.markdown(
+                        f'<iframe width="100%" height="400" src="{embed_url}" frameborder="0" allowfullscreen></iframe>',
+                        unsafe_allow_html=True,
+                    )
 
             else:
                 st.warning("⚠ No comments found on this video.")
