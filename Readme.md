@@ -43,17 +43,6 @@ The **YouTube Comment Sentiment Analysis App** is a Streamlit-based web applicat
 | Visualization       | Matplotlib, Seaborn, WordCloud |
 | Hosting             | Streamlit Cloud              |
 
----
-
-## 📷 Sample UI
-
-| Sentiment Pie Chart | Video Embed |
-|---------------------|-------------|
-| ![chart](https://i.imgur.com/XYZchart.png) | ![video](https://i.imgur.com/XYZvideo.png) |
-
-_Replace above URLs with actual screenshots or use Streamlit’s screenshot tool._
-
----
 
 ## 🧪 How to Run Locally
 
